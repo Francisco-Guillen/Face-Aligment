@@ -1,0 +1,9 @@
+opencv-python
+numpy
+scikit-image
+dlib
+mtcnn
+scipy
+onnxruntime
+torch
+torchvision
