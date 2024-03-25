@@ -11,5 +11,4 @@ def default_list_reader(fileList):
     return imgList
 
 
-#fileList = '/home/socialab/Desktop/Joao/projects/LightCNN_attloss/imagelists/val_person_att.txt'
 #imglist = default_list_reader(fileList)
