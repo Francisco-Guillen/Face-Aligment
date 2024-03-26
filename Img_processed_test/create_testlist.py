@@ -16,24 +16,24 @@ def dataset_images_list(dataset_root, start_id=0):
         id = id + 1
     return ds_list
 
-# Configurar o argumento de linha de comando
-parser = argparse.ArgumentParser(description='Criação de lista de imagens e labels a partir de um diretório raiz.')
-parser.add_argument('dataset_root', type=str, help='Diretório raiz do conjunto de dados')
+# Setting the command line argument
+parser = argparse.ArgumentParser(description='Creating a list of images and labels from a root directory.')
+parser.add_argument('dataset_root', type=str, help='Dataset root directory')
 
-# Obter o valor do argumento
+# Get the value of the argument
 args = parser.parse_args()
 
-# Diretório raiz do conjunto de dados
+# Dataset root directory
 dataset_root = args.dataset_root
 
-# Criação da lista de imagens e labels
+# Creating the list of images and labels
 ds_list = dataset_images_list(dataset_root)
 
-# Criação do arquivo de texto
+# Creating a text file
 dataset_imglist = open(f'TestLists/test_{dataset_root}.txt', 'w')
-# Escrever os caminhos das imagens e suas labels no arquivo
+# Write the paths of the images and their labels in the file
 for img_path, label in ds_list:
     dataset_imglist.write(f'{img_path} {label}\n')
 
-# Fechar o arquivo
+# Close the file
 dataset_imglist.close()

@@ -26,14 +26,14 @@ def dataset_images_list(dataset_root, start_id=0):
     return ds_list, id-1
 
 
-# Configurar o argumento de linha de comando
-parser = argparse.ArgumentParser(description='Criação de lista de imagens e labels a partir de um diretório raiz.')
-parser.add_argument('ds4_root', type=str, help='Diretório raiz do conjunto de dados')
+# Setting the command line argument
+parser = argparse.ArgumentParser(description='Creating a list of images and labels from a root directory.')
+parser.add_argument('ds4_root', type=str, help='Dataset root directory')
 
-# Obter o valor do argumento
+# Get the value of the argument
 args = parser.parse_args()
 
-# Diretório raiz do conjunto de dados
+# Dataset root directory
 ds4_root = args.ds4_root
 
 ds4_list, max_id = dataset_images_list(ds4_root, start_id=0)

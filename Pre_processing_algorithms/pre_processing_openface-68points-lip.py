@@ -2,24 +2,23 @@ import cv2
 import dlib
 import numpy as np
 from skimage import transform as trans
-
 import os
 
-#Diretórios de entrada e saída treino/validação
+# Training/validation input and output directories
 input_dir = '../VGG'
-output_dir = '../Img_processadas_treino/VGG_preproc_68points_lip'
+output_dir = '../Img_processed_train/VGG_preproc_68points_lip'
 
-#Diretórios de entrada e saída para teste
-#input_dir = '../lfw-deepfunneled'
-#output_dir = '../Img_processadas_teste/LFW_preproc_68points_lip'
+# Input and output directories for testing
+# input_dir = '../lfw-deepfunneled'
+# output_dir = '../Img_processed_test/LFW_preproc_68points_lip'
 
-#Tamanho das imagens para o conjunto de treino
+# Size of the images for the training set
 desiredFaceWidth = 144
 desiredFaceHeight = 144 
             
-#Tamanho das imagens para o conjunto de teste
-#desiredFaceWidth = 128
-#desiredFaceHeight = 128
+# Size of the images for the test set
+# desiredFaceWidth = 128
+# desiredFaceHeight = 128
 
 TEMPLATE = np.float32([
     (0.0792396913815, 0.339223741112), (0.0829219487236, 0.456955367943),
@@ -63,25 +62,25 @@ INNER_EYES_AND_BOTTOM_LIP = [39, 42, 57]
 OUTER_EYES_AND_NOSE = [36, 45, 33]
 seven_points = [36, 39, 42, 45, 33, 48, 54]
 
-#Cria a pasta de saída se ela ainda não existir
+# Create the output folder if it doesn't already exist
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
     
 for person_name in os.listdir(input_dir):
     person_dir = os.path.join(input_dir, person_name)
 
-    # Pula se o item na pasta "lfw" não for uma pasta
+    # Skip if the item in the "lfw" folder is not a folder
     if not os.path.isdir(person_dir):
         continue
 
-    # Cria uma nova pasta com o mesmo nome na pasta "lfw_preprocessadas"
+    # Create a new folder with the same name in the "lfw_preprocessed" folder
     person_output_dir = os.path.join(output_dir, person_name)
     if not os.path.exists(person_output_dir):
         os.makedirs(person_output_dir)
 
-    # Loop através de todas as imagens na pasta atual
+    # Loop through all the images in the current folder
     for image_name in os.listdir(person_dir):
-        # Ignora arquivos que não são imagens
+        # Ignore files that are not images
         if not (image_name.endswith('.jpg') or image_name.endswith('.png')):
             continue
 
@@ -94,7 +93,7 @@ for person_name in os.listdir(input_dir):
         faces = detector(img)
 
         if len(faces) == 0:
-            # Pula se não houver nenhum rosto detectado na imagem
+            # Skip if there is no face detected in the image
             continue
         else:
             landmarks = predictor(img, faces[0])

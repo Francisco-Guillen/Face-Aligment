@@ -1,24 +1,23 @@
 import cv2
 import dlib
 import numpy as np
-from skimage import transform as trans
 import os
 
-#Diretórios de entrada e saída treino/validação
+# Training/validation input and output directories
 input_dir = '../VGG'
-output_dir = '../Img_processadas_treino/VGG_preproc_OUTER_EYES_AND_LIP'
+output_dir = '../Img_processed_train/VGG_preproc_OUTER_EYES_AND_NOSE_affine'
 
-#Diretórios de entrada e saída para teste
-#input_dir = '../lfw-deepfunneled'
-#output_dir = '../Img_processadas_teste/LFW_preproc_OUTER_EYES_AND_LIP'
+# Input and output directories for testing
+# input_dir = '../lfw-deepfunneled'
+# output_dir = '../Img_processed_test/LFW_preproc_OUTER_EYES_AND_NOSE_affine'
 
+# Size of the images for the training set
 desiredFaceWidth = 144
 desiredFaceHeight = 144 
 
-#Tamanho das imagens para o conjunto de teste
-#desiredFaceWidth = 128
-#desiredFaceHeight = 128
-
+# Size of the images for the test set
+# desiredFaceWidth = 128
+# desiredFaceHeight = 128
 
 TEMPLATE = np.float32([
     (0.0792396913815, 0.339223741112), (0.0829219487236, 0.456955367943),
@@ -60,57 +59,88 @@ TPL_MIN, TPL_MAX = np.min(TEMPLATE, axis=0), np.max(TEMPLATE, axis=0)
 MINMAX_TEMPLATE = (TEMPLATE - TPL_MIN) / (TPL_MAX - TPL_MIN)
 INNER_EYES_AND_BOTTOM_LIP = [39, 42, 57]
 OUTER_EYES_AND_NOSE = [36, 45, 33]
-seven_points = [36, 39, 42, 45, 33, 48, 54]
 
-#Cria a pasta de saída se ela ainda não existir
+# Create the output folder if it doesn't already exist
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
     
 for person_name in os.listdir(input_dir):
     person_dir = os.path.join(input_dir, person_name)
 
-    # Pula se o item na pasta "lfw" não for uma pasta
+    # Skip if the item in the "lfw" folder is not a folder
     if not os.path.isdir(person_dir):
         continue
 
-    # Cria uma nova pasta com o mesmo nome na pasta "lfw_preprocessadas"
+    # Create a new folder with the same name in the "lfw_preprocessed" folder
     person_output_dir = os.path.join(output_dir, person_name)
     if not os.path.exists(person_output_dir):
         os.makedirs(person_output_dir)
 
-    # Loop através de todas as imagens na pasta atual
+    # Loop through all the images in the current folder
     for image_name in os.listdir(person_dir):
-        # Ignora arquivos que não são imagens
+        # Ignore files that are not images
         if not (image_name.endswith('.jpg') or image_name.endswith('.png')):
             continue
+
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-        
         image_path = os.path.join(person_dir, image_name)
         img = cv2.imread(image_path)
-
         faces = detector(img)
         
         if len(faces) == 0:
-            # Pula se não houver nenhum rosto detectado na imagem
+            # Skip if there is no face detected in the image
             continue
-        else:
+        else:        
             landmarks = predictor(img, faces[0])
-            landmarks = list(map(lambda p: (p.x, p.y), landmarks.parts())) 
-            
-            landmarkIndices=INNER_EYES_AND_BOTTOM_LIP
+            landmarks = list(map(lambda p: (p.x, p.y), landmarks.parts()))
+
+            landmarkIndices=OUTER_EYES_AND_NOSE
 
             npLandmarks = np.float32(landmarks)
             npLandmarkIndices = np.array(landmarkIndices)
 
-            for (x, y) in npLandmarks[npLandmarkIndices]:
-                cv2.circle(img, (int(x), int(y)), 3, (0, 255, 0), -1)
-            
-            tform = trans.SimilarityTransform()
-            tform.estimate(npLandmarks[npLandmarkIndices], desiredFaceWidth * MINMAX_TEMPLATE[npLandmarkIndices])
-            M = tform.params[0:2, :]
+            left_eye = npLandmarks[npLandmarkIndices][0]
 
-            thumbnail = cv2.warpAffine(img, M, (desiredFaceWidth, desiredFaceHeight))
-            gray_img = cv2.cvtColor(thumbnail, cv2.COLOR_BGR2GRAY)
+            right_eye = npLandmarks[npLandmarkIndices][1]
+
+            nose = npLandmarks[npLandmarkIndices][2]
+
+            # Desired eye position
+            desiredLeftEye = (0.35, 0.35)           
+            desiredRightEyeX = 1.0 - desiredLeftEye[0]
+
+            # Eye centre
+            eyesCenter = ((left_eye[0] + right_eye[0]) // 2, (left_eye[1] + right_eye[1]) // 2)
+
+            # Position of the centre of each eye
+            dY = right_eye[1] - left_eye[1]
+            dX = right_eye[0] - left_eye[0]
+            # Calculate the angle between the line connecting the eye points and the x-axis
+            angle = np.degrees(np.arctan2(dY, dX))
+
+            # Calculate the scale
+            # Distance between the centre of the two eyes
+            dist = np.sqrt((dX ** 2) + (dY ** 2))
+            # Distance the eyes will have from each other
+            desiredDist = (desiredRightEyeX - desiredLeftEye[0])
+            desiredDist *= desiredFaceWidth
+            # Desired scale
+            scale = desiredDist / dist
+
+            # Rotation matrix
+            M = cv2.getRotationMatrix2D(eyesCenter, angle, scale)
+
+
+            # Translation matrix
+            tx = desiredFaceWidth * 0.5
+            ty = desiredFaceHeight * desiredLeftEye[1]
+            M[0, 2] += (tx - eyesCenter[0])
+            M[1, 2] += (ty - eyesCenter[1])
+
+            # Affinity transformation
+            aligned = cv2.warpAffine(img, M, (desiredFaceWidth, desiredFaceHeight), flags=cv2.INTER_CUBIC)
+
+            gray_img = cv2.cvtColor(aligned, cv2.COLOR_BGR2GRAY)
             preprocessed_path = os.path.join(person_output_dir, image_name)
-            cv2.imwrite(preprocessed_path, thumbnail)
+            cv2.imwrite(preprocessed_path, gray_img)

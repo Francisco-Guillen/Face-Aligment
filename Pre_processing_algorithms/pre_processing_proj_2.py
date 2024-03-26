@@ -8,23 +8,23 @@ import os
 from insightface.utils import face_align
 from skimage import transform as trans
 
-#Diretórios de entrada e saída treino/validação
+# Training/validation input and output directories
 input_dir = '../VGG'
-output_dir = '../Img_processadas_treino/VGG_preproc_proj_2'
+output_dir = '../Img_processed_train/VGG_preproc_proj_2'
 
-#Diretórios de entrada e saída para teste
-#input_dir = '../lfw-deepfunneled'
-#output_dir = '../Img_processadas_teste/LFW_preproc_proj_2'
+# Input and output directories for testing
+# input_dir = '../lfw-deepfunneled'
+# output_dir = '../Img_processed_test/LFW_preproc_proj_2'
 
-#Tamanho das imagens para o conjunto de treino
+#Size of the images for the training set
 desiredFaceWidth = 144
 desiredFaceHeight = 144 
             
-#Tamanho das imagens para o conjunto de teste
+#Size of the images for the test set
 #desiredFaceWidth = 128
 #desiredFaceHeight = 128
 
-# Cria a pasta de saída se ela ainda não existir
+# Create the output folder if it doesn't already exist
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -32,32 +32,32 @@ model_pack_name = 'buffalo_l'
 app = FaceAnalysis(name=model_pack_name)
 app.prepare(ctx_id=0, det_size=(640, 640))
 
-# Loop através de todas as subpastas na pasta "lfw"
+# Loop through all the subfolders in the "lfw" folder
 for person_name in os.listdir(input_dir):
     person_dir = os.path.join(input_dir, person_name)
 
-    # Pula se o item na pasta "lfw" não for uma pasta
+    # Skip if the item in the "lfw" folder is not a folder
     if not os.path.isdir(person_dir):
         continue
 
-    # Cria uma nova pasta com o mesmo nome na pasta "lfw_preprocessadas"
+    # Create a new folder with the same name in the "lfw_preprocessed" folder
     person_output_dir = os.path.join(output_dir, person_name)
     if not os.path.exists(person_output_dir):
         os.makedirs(person_output_dir)
 
-    # Loop através de todas as imagens na pasta atual
+    # Loop through all the images in the current folder
     for image_name in os.listdir(person_dir):
         # Ignora arquivos que não são imagens
         if not (image_name.endswith('.jpg') or image_name.endswith('.png')):
             continue
 
-        # Carrega a imagem e detecta as landmarks
+        # Load the image and detect the landmarks
         image_path = os.path.join(person_dir, image_name)
         img = cv2.imread(image_path)
         faces = app.get(img)
 
         if len(faces) == 0:
-            # Pula se não houver nenhum rosto detectado na imagem
+            # Skip if there is no face detected in the image
             continue
         else:
             face_bbox = faces[0]['bbox']
@@ -67,11 +67,11 @@ for person_name in os.listdir(input_dir):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
 
-            # Pontos de destino
+            # Destination points
             dst = np.array([[0, 0], [desiredFaceWidth-1, 0], [0, desiredFaceHeight-1], [desiredFaceWidth-1, desiredFaceHeight-1]], dtype=np.float32)
 
-            # Pontos de origem (cantos da imagem recortada)
-            # Pontos de destino para a transformação (cantos da caixa delimitadora)
+            # Source points (corners of the cropped image)
+            # Target points for the transformation (corners of the bounding box)
             bbox_points = [(face_bbox[0], face_bbox[1]), (face_bbox[2], face_bbox[1]), (face_bbox[0], face_bbox[3]), (face_bbox[2], face_bbox[3])]
             src_points = np.array(bbox_points, dtype=np.float32)
             
@@ -80,6 +80,6 @@ for person_name in os.listdir(input_dir):
             dst = cv2.warpPerspective(img, M, (desiredFaceWidth, desiredFaceHeight))
 
             gray_img = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
-            # Guardar a imagem preprocessada na pasta da pessoa
+            # Save the preprocessed image in the person's folder
             preprocessed_path = os.path.join(person_output_dir, image_name)
             cv2.imwrite(preprocessed_path, dst)

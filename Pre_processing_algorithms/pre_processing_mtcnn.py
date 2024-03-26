@@ -4,64 +4,64 @@ import numpy as np
 from skimage import transform as trans
 import os
 
-#Diretórios de entrada e saída treino/validação
+# Training/validation input and output directories
 input_dir = '../VGG'
-output_dir = '../Img_processadas_treino/VGG_preproc_mtcnn'
+output_dir = '../Img_processed_train/VGG_preproc_mtcnn'
 
-#Diretórios de entrada e saída para teste
-#input_dir = '../lfw'
-#output_dir = '../Img_processadas_teste/LFW_preproc_mtcnn'
+# Input and output directories for testing
+# input_dir = '../lfw-deepfunneled'
+# output_dir = '../Img_processed_test/LFW_preproc_mtcnn'
 
-#Tamanho das imagens para o conjunto de treino
+#  Size of the images for the training set
 desiredFaceWidth = 144
 desiredFaceHeight = 144 
 
-#Tamanho das imagens para o conjunto de teste
-#desiredFaceWidth = 128
-#desiredFaceHeight = 128
+# Size of the images for the test set
+# desiredFaceWidth = 128
+# desiredFaceHeight = 128
 
-#Cria a pasta de saída se ela ainda não existir
+# Create the output folder if it doesn't already exist
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 for person_name in os.listdir(input_dir):
     person_dir = os.path.join(input_dir, person_name)
 
-    # Pula se o item na pasta "lfw" não for uma pasta
+    # Skip if the item in the "lfw" folder is not a folder
     if not os.path.isdir(person_dir):
         continue
 
-    # Cria uma nova pasta com o mesmo nome na pasta "lfw_preprocessadas"
+    # Create a new folder with the same name in the "lfw_preprocessed" folder
     person_output_dir = os.path.join(output_dir, person_name)
     if not os.path.exists(person_output_dir):
         os.makedirs(person_output_dir)
 
-    # Loop através de todas as imagens na pasta atual
+    # Loop through all the images in the current folder
     for image_name in os.listdir(person_dir):
-        # Ignora arquivos que não são imagens
+        # Ignore files that are not images
         if not (image_name.endswith('.jpg') or image_name.endswith('.png')):
             continue
         
         image_path = os.path.join(person_dir, image_name)
-        # Carregando a imagem de entrada
+        # Loading the input image
         img = cv2.imread(image_path)
 
-        # Inicializando o detector MTCNN
+        # Initialising the MTCNN detector
         detector = MTCNN()
 
-        # Detectando rostos na imagem
+        # Detecting faces in the image
         results = detector.detect_faces(img)
         
         if len(results) == 0:
-            # Pula se não houver nenhum rosto detectado na imagem
+            # Skip if there is no face detected in the image
             continue
         else:
 
-            # Desenhando um retângulo em volta de cada rosto detectado
+            # Drawing a rectangle around each detected face
 
             x, y, w, h = results[0]['box']
             keypoints = results[0]['keypoints']
-            #cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            # cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
             left_eye = results[0]['keypoints']['left_eye']
             right_eye = results[0]['keypoints']['right_eye']
             nose = results[0]['keypoints']['nose']
@@ -70,41 +70,41 @@ for person_name in os.listdir(input_dir):
             
             for _, values in results[0]['keypoints'].items():
                 cv2.circle(img, values, 3, (0, 255, 0), -1)
-            #cv2.circle(img, mouth_left, 2, (0, 0, 255), -1)
+            # cv2.circle(img, mouth_left, 2, (0, 0, 255), -1)
 
-            #Posição dos olhos pretendida
+            # Desired eye position
             desiredLeftEye = (0.35, 0.35)        
             desiredRightEyeX = 1.0 - desiredLeftEye[0]
-            
-            #Centro dos olhos
+             
+            # Eye centre
             eyesCenter = ((left_eye[0] + right_eye[0]) // 2, (left_eye[1] + right_eye[1]) // 2)
 
-            #Posição do centro de cada olho
+            # Position of the centre of each eye
             dY = right_eye[1] - left_eye[1]
             dX = right_eye[0] - left_eye[0]
-            ## Calcular o ângulo entre a linha que liga os pontos dos olhos e o eixo x
+            # Calculate the angle between the line connecting the eye points and the x-axis
             angle = np.degrees(np.arctan2(dY, dX))
 
 
-            #Calcular a escala
-            #Distancia entre o centro dos dois olhos
+            # Calculate the scale
+            # Distance between the centre of the two eyes
             dist = np.sqrt((dX ** 2) + (dY ** 2))
-            #Distancia que os olhos irão ter um do outro
+            # Distance the eyes will have from each other
             desiredDist = (desiredRightEyeX - desiredLeftEye[0])
             desiredDist *= desiredFaceWidth
-            #Escala desejada
+            # Desired scale
             scale = desiredDist / dist
 
-            #Matriz de rotação
+            # Rotation matrix
             M = cv2.getRotationMatrix2D(eyesCenter, angle, scale)
 
-            #Matriz de translação
+            # Translation matrix
             tx = desiredFaceWidth * 0.5
             ty = desiredFaceHeight * desiredLeftEye[1]
             M[0, 2] += (tx - eyesCenter[0])
             M[1, 2] += (ty - eyesCenter[1])
 
-            #Tranformação afim
+            # Affinity transformation
             aligned = cv2.warpAffine(img, M, (desiredFaceWidth, desiredFaceHeight), flags=cv2.INTER_CUBIC)
 
             gray_img = cv2.cvtColor(aligned, cv2.COLOR_BGR2GRAY)
