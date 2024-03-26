@@ -115,7 +115,24 @@ We utilize LightCNN, a Convolutional Neural Network developed by Alfred Xiang Wu
   </table>
 </div>
 
+## Model Evaluation
+<div align="center">
 
+<table>
+<tr><td>
 
+|| Accuracy |
+|--|--|
+|Affine (InsightFace)| 89.40%|
+|Affine (MTCNN)| 89.83%|
+|Affine (Dlib)| 90.10%|
+|Projective (InsightFace)| 88.29%|
+|Similarity (InsightFace)| 89.28%|
+|Similarity (Dlib) 3 points (Eyes and Mouth)| 89.31%|
+|Similarity (Dlib) 3 points (Eyes and Nose)|89.97%|
+|Similarity (Dlib) 7 points|89.90%|
+|Similarity (Dlib) 8 points|89.50%|
+</td></tr> </table>
+</div>
 
 
