@@ -89,6 +89,9 @@ This is the most advanced transformation, which, unlike the affine transformatio
 </div>
 
 ## Model Training
+
+We utilize LightCNN, a Convolutional Neural Network developed by Alfred Xiang Wu, to train our models. It is designed to provide an efficient and lightweight solution for facial recognition tasks. To use this network for training the models, you can refer to the GitHub repository at [Light CNN for Deep Face Recognition, in PyTorch](https://github.com/AlfredXiangWu/LightCNN).
+
 - Epochs: 30
 - Batch size: 32
 - Learning rate: 0.001
