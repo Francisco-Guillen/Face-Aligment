@@ -39,9 +39,80 @@ CNN-based facial detection and alignment method, which is capable of extracting 
 ### Dlib
 
 Facial detection and alignment method, capable of extracting up to 68 facial reference points. Dlib is a linear regression model that uses previously labelled fiducial points in images to learn patterns and thus be able to predict the location of fiducial points in new images. 
-
-<div align="center" style="padding: 80px;">
-  <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/d1aa0a03-7fb5-48cb-bb2b-8b5b9fe63f13" align="left">
-  <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/e725f8ce-314b-4f4b-ae19-e5f4ef24032b" align= "center">
-  <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/b83e7cbb-bdd1-482c-bc38-3ae12a3f3958" align="right">
+<div align="center">
+  <table>
+    <tr>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/d1aa0a03-7fb5-48cb-bb2b-8b5b9fe63f13"><br>
+        <p>Figure 1: InisghtFace</p>
+      </td>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/e725f8ce-314b-4f4b-ae19-e5f4ef24032b"><br>
+        <p>Figure 2: MTCNN</p>
+      </td>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/b83e7cbb-bdd1-482c-bc38-3ae12a3f3958"><br>
+        <p>Figure 3: Dlib</p>
+      </td>
+    </tr>
+  </table>
 </div>
+
+## Geometric Transformations
+
+### Affine Transformation
+This is a linear transformation that preserves parallelism between lines, angles and planes. It has a wide range of functionalities, such as rotation, scaling, translation and shearing, thus allowing you to adjust the position and orientation of facial elements.
+
+### Similarity Transformation 
+This is a type of geometric transformation that preserves angles and the ratio of distances between points. 
+
+### Projective Transformation
+This is the most advanced transformation, which, unlike the affine transformation, does not preserve the parallelism between the lines. 
+
+<div align="center">
+  <table>
+    <tr>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/2d059767-9fc9-40b8-b189-3d539fc0d0d7"><br>
+        <p>Figure 3: Affine Transformation</p>
+      </td>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/95075b2d-3994-4215-9f19-daa8ca0de332"><br>
+        <p>Figure 4: Similarity Transformation</p>
+      </td>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/348c8334-4e63-4d6b-9832-069d81a8f813"><br>
+        <p>Figure 5: Projective Transformation</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+## Model Training
+- Epochs: 30
+- Batch size: 32
+- Learning rate: 0.001
+
+<div align="center">
+  <table>
+    <tr>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/837e436b-40aa-4f43-8b7c-78faf15ea1f7"><br>
+        <p>Figure 6: Loss over the epochs in each method</p>
+      </td>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/e29d4134-4fdd-4e74-aaf9-0359dc8c3d01"><br>
+        <p>Figure 7: Loss over the epochs in each transformation</p>
+      </td>
+      <td style="text-align: center;">
+        <img src="https://github.com/Francisco-Guillen/Face-Aligment/assets/83434031/ec1d291b-3bf3-4366-af66-33264d8defe1"><br>
+        <p>Figure 8: Loss over the epochs using different facial reference points.</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+
+
+
