@@ -24,6 +24,13 @@ git clone https://github.com/AlfredXiangWu/LightCNN.git
 ```
 Make sure to execute these commands in the correct directory where you want the files to be installed and cloned.
 
+## Datasets
+
+**[VGGFace2](https://paperswithcode.com/dataset/vggface2-1):** is a dataset comprised of approximately 3.31 million images categorized into 9131 classes, each corresponding to an individual identity, and primarily used for training and validation.
+Due to its considerable size, only the first 300 classes were utilized, totaling around 110,000 images. This selection was made to ease the handling of the dataset while maintaining a significant representation of the identities present.
+
+**[LFW](https://vis-www.cs.umass.edu/lfw/):** On the other hand, LFW (Labeled Faces in the Wild) consists of around 13,000 facial images encompassing over 5,700 different individuals. This dataset serves as a benchmark for testing face recognition systems.
+
 
 ## Facial Alignment Methods
 
@@ -135,4 +142,15 @@ We utilize LightCNN, a Convolutional Neural Network developed by Alfred Xiang Wu
 </td></tr> </table>
 </div>
 
+Features are extracted from the pre-processed LFW dataset by each of the algorithms in order to assess their performance. To this end, after extracting the features, it is possible to measure the accuracy of each of the algorithms using the (ROC) curve and the (AUC) based on the cosine distance between the embeddings of the image pairs.
 
+It can be seen that the most efficient method for image pre-processing was dlib in conjunction with the affine transformation, with an accuracy of 90.10%, followed by the MTCNN method in conjunction with the affine transformation, which achieved an accuracy of 89.83%.
+It is also possible to observe that choosing a greater number of facial reference points is not always the best, since using only three reference points, the outside of each eye and the centre of the nose, gives a better accuracy than using seven reference points or even 68. 
+This may be because fewer points minimise the impact of noise and point detection errors, making the facial alignment process more robust. Or because by using fewer points, overfitting can be avoided, allowing for better generalisation for faces with different characteristics.
+
+## Refferences
+- [LFW](https://vis-www.cs.umass.edu/lfw/)
+- [VGGFace2](https://paperswithcode.com/dataset/vggface2-1)
+- [InsightFace](https://en.wikipedia.org/wiki/Netpbm](https://github.com/deepinsight/insightface))
+- [LightCNN](https://www.geeksforgeeks.org/quad-tree/](https://github.com/AlfredXiangWu/LightCNN))
+- [Face Alignment with OpenCV and Python](https://v2.ocaml.org/api/Array.html](https://pyimagesearch.com/2017/05/22/face-alignment-with-opencv-and-python/)https://pyimagesearch.com/2017/05/22/face-alignment-with-opencv-and-python/)
